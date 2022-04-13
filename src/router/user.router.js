@@ -6,5 +6,4 @@ const { verifyUser, handlePassword } = require('../middleware/user.middleware')
 const userRouter = new Router({ prefix: '/user' })
 
 userRouter.post('/', verifyUser, handlePassword, create)
-
 module.exports = userRouter

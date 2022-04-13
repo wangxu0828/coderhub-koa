@@ -1,7 +1,6 @@
 const fs = require('fs')
 const useRouter = (app) => {
   const dirs = fs.readdirSync(__dirname)
-  console.log(dirs)
   dirs.forEach((item) => {
     if (item === 'index.js') {
       return

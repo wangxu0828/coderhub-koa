@@ -1,4 +1,4 @@
-const { NAME_OR_PASSWORD_IS_REQUIRED, NAME_ALREADY_EXIST, NAME_IS_NOT_EXIST, PASSWORD_IS_INCURRENT } = require('../constants/error-types')
+const { NAME_OR_PASSWORD_IS_REQUIRED, NAME_ALREADY_EXIST, NAME_IS_NOT_EXIST, PASSWORD_IS_INCURRENT, TOKEN_ERROR, MOMENT_COTENT_IS_NOT_EXIST, UNPERMISSION } = require('../constants/error-types')
 
 const errorHandler = (err, ctx) => {
   let massage
@@ -18,6 +18,18 @@ const errorHandler = (err, ctx) => {
       break
     case PASSWORD_IS_INCURRENT:
       massage = '密码错误'
+      code = 400
+      break
+    case TOKEN_ERROR:
+      massage = 'token错误'
+      code = 401
+      break
+    case UNPERMISSION:
+      massage = '你没有操作的权限'
+      code = 401
+      break
+    case MOMENT_COTENT_IS_NOT_EXIST:
+      massage = '动态内容不能为空'
       code = 400
       break
     default:

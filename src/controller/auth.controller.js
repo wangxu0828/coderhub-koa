@@ -1,8 +1,19 @@
 // 权限请求接口具体逻辑
+const { PRIVATE_KEY, PUBLIC_KEY } = require('../app/config')
+const jwt = require('jsonwebtoken')
 class AuthController {
   // 用户注册
   login(ctx, next) {
-    ctx.body = `登陆成功,欢迎${ctx.request.body.name}回来`
+    const { id, name } = ctx.user
+    const token = jwt.sign(ctx.user, PRIVATE_KEY, {
+      expiresIn: 60 * 60 * 24,
+      algorithm: 'RS256',
+    })
+    ctx.body = {
+      id,
+      name,
+      token,
+    }
   }
 }
 

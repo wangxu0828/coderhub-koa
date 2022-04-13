@@ -1,8 +1,11 @@
 // 登陆接口数据验证中间件
-const { NAME_OR_PASSWORD_IS_REQUIRED, NAME_IS_NOT_EXIST, PASSWORD_IS_INCURRENT } = require('../constants/error-types')
+const { NAME_OR_PASSWORD_IS_REQUIRED, NAME_IS_NOT_EXIST, PASSWORD_IS_INCURRENT, TOKEN_ERROR, UNPERMISSION } = require('../constants/error-types')
+const { PUBLIC_KEY } = require('../app/config')
 // 用户账号是否存在和用户账号是否重复逻辑一样
 const { checkNameExist } = require('../service/user.service')
 const md5Password = require('../untils/handle-password')
+const { checkPermission } = require('../service/auth.service')
+const jwt = require('jsonwebtoken')
 const checkLogin = async (ctx, next) => {
   const { name, password } = ctx.request.body
 
@@ -27,9 +30,52 @@ const checkLogin = async (ctx, next) => {
     return ctx.app.emit('error', err, ctx)
   }
 
+  ctx.user = user
+
   await next()
+}
+
+// 验证用户是否登陆
+const verifyAuth = async (ctx, next) => {
+  const token = ctx.header?.authorization?.replace('Bearer ', '')
+  if (token) {
+    try {
+      const result = jwt.verify(token, PUBLIC_KEY, {
+        algorithms: ['RS256'],
+      })
+      ctx.user = {
+        id: result.id,
+        name: result.name,
+      }
+      await next()
+    } catch (error) {
+      console.log(error)
+      const err = new Error(TOKEN_ERROR)
+      ctx.app.emit('error', err, ctx)
+    }
+  } else {
+    const err = new Error(TOKEN_ERROR)
+    ctx.app.emit('error', err, ctx)
+  }
+}
+
+const verifyPermission = (tableName) => {
+  return async (ctx, next) => {
+    const { id } = ctx.user
+    const tableId = ctx.params[`${tableName}Id`]
+    // 查询是否具备权限
+    const res = await checkPermission(tableId, id, tableName)
+    if (res) {
+      await next()
+    } else {
+      const error = new Error(UNPERMISSION)
+      ctx.app.emit('error', error, ctx)
+    }
+  }
 }
 
 module.exports = {
   checkLogin,
+  verifyAuth,
+  verifyPermission,
 }
