@@ -12,7 +12,9 @@ class CommentService {
     try {
       const [result] = await connection.execute(statement, [content, id, momentId, commentId])
       return result
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async updateComment(commentId, content) {
@@ -27,7 +29,7 @@ class CommentService {
       const [result] = await connection.execute(statement, [commentId])
       return result
     } catch (error) {
-      console.log(123123)
+      console.log(error)
     }
   }
 }

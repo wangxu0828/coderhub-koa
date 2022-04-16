@@ -3,8 +3,8 @@ class CommentController {
   async createComment(ctx, next) {
     const { momentId, content } = ctx.request.body
     const { id } = ctx.user
-
-    const result = await service.createCommentreateComment(momentId, content, id)
+    console.log(momentId, content, id)
+    const result = await service.createComment(momentId, content, id)
     ctx.body = result
   }
 
